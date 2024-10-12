@@ -1,12 +1,8 @@
 import axios from 'axios';
+import { Memo } from '../types';
 
 // 假设您的后端 API 基础 URL 存储在环境变量中
 const API_BASE_URL = 'http://localhost:3000/api'; // Replace with your actual API URL
-
-interface Memo {
-    tokenAddress: string;
-    events: Event[];
-}
 
 interface Event {
     timestamp: string;

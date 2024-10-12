@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createMemo } from '../utils/memoApi'
+import { Skull } from 'lucide-react'
 
 interface TokenInfo {
   name: string;
@@ -48,13 +49,13 @@ const MemoForm: React.FC = () => {
 
         if (tokenInfo) {
           await createMemo(tokenAddress.trim())
-          navigate(`/memo/${tokenAddress.trim()}`) // Navigate to the newly created memo page
+          navigate(`/memo/${tokenAddress.trim()}`)
         } else {
-          setError('Unable to fetch token information. Please check the address and try again.')
+          setError('The sigil is unrecognized. Verify the inscription and attempt the ritual anew.')
         }
       } catch (error) {
         console.error('Error creating memo:', error)
-        setError('An error occurred while creating the memo. Please try again.')
+        setError('A dark force intervenes. The ritual must be attempted again.')
       } finally {
         setIsLoading(false)
       }
@@ -62,30 +63,33 @@ const MemoForm: React.FC = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Create Memecoin Memo</h1>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
-        <div className="mb-4">
-          <label htmlFor="tokenAddress" className="block text-gray-700 font-semibold mb-2">
-            Token Address
+    <div className="max-w-md mx-auto p-6 bg-gray-900 text-amber-100 rounded-lg shadow-lg border border-amber-900">
+      <h1 className="text-3xl font-bold mb-6 text-amber-400 font-serif flex items-center">
+        <Skull size={32} className="mr-2" />
+        Inscribe New Sigil
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="tokenAddress" className="block text-amber-200 font-semibold mb-2 font-serif">
+            Token Sigil
           </label>
           <input
             type="text"
             id="tokenAddress"
             value={tokenAddress}
             onChange={(e) => setTokenAddress(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter token address"
+            className="w-full px-3 py-2 bg-gray-800 border border-amber-900 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600 text-amber-100"
+            placeholder="Inscribe the mystical address"
             required
           />
         </div>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && <p className="text-red-500 font-serif">{error}</p>}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors"
+          className="w-full bg-amber-700 text-black py-2 px-4 rounded-md font-bold hover:bg-amber-600 transition-colors duration-300 font-serif"
           disabled={isLoading}
         >
-          {isLoading ? 'Loading...' : 'Create Memo'}
+          {isLoading ? 'Channeling energies...' : 'Perform Ritual'}
         </button>
       </form>
     </div>
