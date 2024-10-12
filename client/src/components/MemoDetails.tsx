@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import { fetchLargeTransactions } from '../utils/duneApi'
 
 interface Memo {
   tokenInfo: {
@@ -9,12 +10,23 @@ interface Memo {
     liquidity: string;
     volume24h: string;
   };
-  events: Array<{ time: string; content: string; link: string }>;
+  events: Array<{
+    time: string;
+    content: string;
+    link: string;
+    largeTransactions?: Array<{
+      amount_usd: number;
+      block_time: string;
+      buyer_address: string;
+      token_bought_amount: number;
+      tx_hash: string;
+    }>
+  }>;
 }
 
 interface MemoDetailsProps {
   memos: Record<string, Memo>
-  addEvent: (tokenAddress: string, event: { time: string; content: string; link: string }) => void
+  addEvent: (tokenAddress: string, event: { time: string; content: string; link: string; largeTransactions?: any[] }) => void
 }
 
 const MemoDetails: React.FC<MemoDetailsProps> = ({ memos, addEvent }) => {
@@ -22,17 +34,40 @@ const MemoDetails: React.FC<MemoDetailsProps> = ({ memos, addEvent }) => {
   const [time, setTime] = useState('')
   const [content, setContent] = useState('')
   const [link, setLink] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [expandedEvents, setExpandedEvents] = useState<Record<number, boolean>>({})
 
   const memo = memos[tokenAddress || '']
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (tokenAddress && time && content) {
-      addEvent(tokenAddress, { time, content, link })
-      setTime('')
-      setContent('')
-      setLink('')
+      setIsLoading(true)
+      setError('')
+      try {
+        const endTime = new Date().toISOString()
+        const startTime = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // 24 hours ago
+        const largeTransactions = await fetchLargeTransactions(startTime, endTime, tokenAddress)
+
+        addEvent(tokenAddress, { time, content, link, largeTransactions })
+        setTime('')
+        setContent('')
+        setLink('')
+      } catch (err) {
+        setError('Failed to fetch large transactions. The event was not added.')
+        console.error('Error fetching large transactions:', err)
+      } finally {
+        setIsLoading(false)
+      }
     }
+  }
+
+  const toggleEventExpansion = (index: number) => {
+    setExpandedEvents(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }))
   }
 
   if (!memo) {
@@ -93,9 +128,11 @@ const MemoDetails: React.FC<MemoDetailsProps> = ({ memos, addEvent }) => {
           <button
             type="submit"
             className="bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors"
+            disabled={isLoading}
           >
-            Add Event
+            {isLoading ? 'Adding...' : 'Add Event'}
           </button>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
         </form>
       </div>
       <div>
@@ -117,6 +154,38 @@ const MemoDetails: React.FC<MemoDetailsProps> = ({ memos, addEvent }) => {
                   >
                     {event.link}
                   </a>
+                )}
+                {event.largeTransactions && event.largeTransactions.length > 0 && (
+                  <div className="mt-4">
+                    <button
+                      onClick={() => toggleEventExpansion(index)}
+                      className="text-blue-600 hover:underline focus:outline-none"
+                    >
+                      {expandedEvents[index] ? 'Hide' : 'Show'} Large Transactions ({event.largeTransactions.length})
+                    </button>
+                    {expandedEvents[index] && (
+                      <table className="w-full table-auto mt-2">
+                        <thead>
+                          <tr>
+                            <th className="px-4 py-2 text-left">Buyer</th>
+                            <th className="px-4 py-2 text-left">Amount (USD)</th>
+                            <th className="px-4 py-2 text-left">Token Amount</th>
+                            <th className="px-4 py-2 text-left">Timestamp</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {event.largeTransactions.map((tx, txIndex) => (
+                            <tr key={txIndex} className={txIndex % 2 === 0 ? 'bg-gray-100' : ''}>
+                              <td className="border px-4 py-2">{tx.buyer_address}</td>
+                              <td className="border px-4 py-2">${tx.amount_usd.toFixed(2)}</td>
+                              <td className="border px-4 py-2">{tx.token_bought_amount.toFixed(2)}</td>
+                              <td className="border px-4 py-2">{new Date(tx.block_time).toLocaleString()}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
                 )}
               </li>
             ))}

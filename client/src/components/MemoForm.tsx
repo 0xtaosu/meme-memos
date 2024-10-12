@@ -47,14 +47,14 @@ const MemoForm: React.FC<MemoFormProps> = ({ addMemo }) => {
       setIsLoading(true)
       setError('')
       const tokenInfo = await fetchTokenInfo(tokenAddress.trim())
-      setIsLoading(false)
 
       if (tokenInfo) {
         addMemo(tokenAddress.trim(), tokenInfo)
-        navigate(`/memo/${tokenAddress.trim()}`)
+        navigate('/') // Assuming you want to navigate to the home page after creating a memo
       } else {
         setError('Unable to fetch token information. Please check the address and try again.')
       }
+      setIsLoading(false)
     }
   }
 
