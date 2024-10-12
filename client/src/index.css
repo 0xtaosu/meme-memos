@@ -55,6 +55,10 @@
     .cult-button {
         @apply bg-amber-700 text-black font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-colors duration-300;
     }
+
+    .footer-link {
+        @apply font-mono text-amber-400 hover:text-amber-300 transition-colors duration-300;
+    }
 }
 
 /* Custom scrollbar */
