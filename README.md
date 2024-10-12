@@ -29,6 +29,7 @@ Meme Memos 是一个专为 memecoin 爱好者和投资者设计的备忘录网�
 ### 服务器端
 - Node.js
 - Express.js
+- TypeScript
 
 ### 数据源
 - Dune API（用于获取链上数据）
@@ -38,19 +39,19 @@ Meme Memos 是一个专为 memecoin 爱好者和投资者设计的备忘录网�
 .
 ├── README.md
 ├── client/
-│ ├── src/
-│ │ ├── components/
-│ │ ├── utils/
-│ │ ├── App.tsx
-│ │ └── main.tsx
-│ ├── package.json
-│ └── vite.config.ts
+│   ├── src/
+│   │   ├── components/
+│   │   ├── utils/
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── package.json
+│   └── vite.config.ts
 └── server/
-├── src/
-│ ├── routes/
-│ ├── services/
-│ └── index.ts
-└── package.json
+    ├── src/
+    │   ├── routes/
+    │   ├── services/
+    │   └── index.ts
+    └── package.json
 ```
 
 ## 开发
@@ -68,11 +69,14 @@ Meme Memos 是一个专为 memecoin 爱好者和投资者设计的备忘录网�
    cd server
    npm install
    ```
-4. 配置服务器端的 Dune API 密钥（参考 Dune API 文档）
+4. 在服务器目录下创建 `.env` 文件，并配置 Dune API 密钥：
+   ```
+   DUNE_API_KEY=your_dune_api_key_here
+   ```
 5. 启动服务器：
    ```
    cd server
-   npm start
+   npm run dev
    ```
 6. 启动客户端开发服务器：
    ```
@@ -92,7 +96,7 @@ Meme Memos 是一个专为 memecoin 爱好者和投资者设计的备忘录网�
 
 客户端通过服务器端的 API 获取这些数据，无需直接与 Dune API 交互。
 
-更多关于 Dune API 的使用方法，请参考 [Dune API 文档](https://docs.dune.com/api-reference/quickstart/results-eg)。
+更多关于 Dune API 的使用方法，请参考 [Dune API 文档](https://dune.com/docs/api/)。
 
 ## 贡献
 
