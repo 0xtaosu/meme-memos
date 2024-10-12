@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { createMemo } from '../utils/memoApi'
 
 interface TokenInfo {
   name: string;
@@ -9,11 +10,7 @@ interface TokenInfo {
   volume24h: string;
 }
 
-interface MemoFormProps {
-  addMemo: (tokenAddress: string, tokenInfo: TokenInfo) => void
-}
-
-const MemoForm: React.FC<MemoFormProps> = ({ addMemo }) => {
+const MemoForm: React.FC = () => {
   const [tokenAddress, setTokenAddress] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -46,15 +43,21 @@ const MemoForm: React.FC<MemoFormProps> = ({ addMemo }) => {
     if (tokenAddress.trim()) {
       setIsLoading(true)
       setError('')
-      const tokenInfo = await fetchTokenInfo(tokenAddress.trim())
+      try {
+        const tokenInfo = await fetchTokenInfo(tokenAddress.trim())
 
-      if (tokenInfo) {
-        addMemo(tokenAddress.trim(), tokenInfo)
-        navigate('/') // Assuming you want to navigate to the home page after creating a memo
-      } else {
-        setError('Unable to fetch token information. Please check the address and try again.')
+        if (tokenInfo) {
+          await createMemo(tokenAddress.trim())
+          navigate(`/memo/${tokenAddress.trim()}`) // Navigate to the newly created memo page
+        } else {
+          setError('Unable to fetch token information. Please check the address and try again.')
+        }
+      } catch (error) {
+        console.error('Error creating memo:', error)
+        setError('An error occurred while creating the memo. Please try again.')
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
     }
   }
 

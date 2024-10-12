@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
-import { fetchLargeTransactions } from '../utils/duneApi';
+import { addEvent } from '../utils/memoApi';
 
 interface Event {
-    id: string;
-    title: string;
+    timestamp: string;
     description: string;
-    date: string;
-    largeTransactions?: any[]; // 根据实际数据结构调整类型
+    link: string;
 }
 
 interface AddEventFormProps {
-    memoId: string;
-    addEvent: (memoId: string, event: Event) => void;
+    tokenAddress: string;
+    onEventAdded: () => void;
 }
 
-const AddEventForm: React.FC<AddEventFormProps> = ({ memoId, addEvent }) => {
-    const [title, setTitle] = useState('');
+const AddEventForm: React.FC<AddEventFormProps> = ({ tokenAddress, onEventAdded }) => {
     const [description, setDescription] = useState('');
-    const [date, setDate] = useState('');
+    const [link, setLink] = useState('');
+    const [timestamp, setTimestamp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -27,29 +25,21 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ memoId, addEvent }) => {
         setError('');
 
         try {
-            // 创建新事件
             const newEvent: Event = {
-                id: Date.now().toString(), // 简单的ID生成方式，实际应用中可能需要更复杂的逻辑
-                title,
+                timestamp,
                 description,
-                date,
+                link,
             };
 
-            // 获取大额交易数据
-            const endTime = new Date().toISOString();
-            const startTime = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(); // 24小时前
-            const largeTransactions = await fetchLargeTransactions(startTime, endTime, memoId);
+            await addEvent(tokenAddress, newEvent);
 
-            // 将大额交易数据添加到事件中
-            newEvent.largeTransactions = largeTransactions;
-
-            // 调用父组件的 addEvent 函数
-            addEvent(memoId, newEvent);
-
-            // 重置表单
-            setTitle('');
+            // Reset form
             setDescription('');
-            setDate('');
+            setLink('');
+            setTimestamp('');
+
+            // Notify parent component that an event was added
+            onEventAdded();
         } catch (err) {
             setError('Failed to add event. Please try again.');
             console.error('Error adding event:', err);
@@ -60,19 +50,6 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ memoId, addEvent }) => {
 
     return (
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-            <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                    Title
-                </label>
-                <input
-                    type="text"
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                />
-            </div>
             <div>
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                     Description
@@ -86,14 +63,27 @@ const AddEventForm: React.FC<AddEventFormProps> = ({ memoId, addEvent }) => {
                 />
             </div>
             <div>
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-                    Date
+                <label htmlFor="link" className="block text-sm font-medium text-gray-700">
+                    Link
                 </label>
                 <input
-                    type="date"
-                    id="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
+                    type="url"
+                    id="link"
+                    value={link}
+                    onChange={(e) => setLink(e.target.value)}
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+            </div>
+            <div>
+                <label htmlFor="timestamp" className="block text-sm font-medium text-gray-700">
+                    Timestamp
+                </label>
+                <input
+                    type="datetime-local"
+                    id="timestamp"
+                    value={timestamp}
+                    onChange={(e) => setTimestamp(e.target.value)}
                     required
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />

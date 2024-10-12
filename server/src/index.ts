@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import duneRoutes from './routes/duneRoutes';
 import path from 'path';
+import memoRoutes from './routes/memoRoutes';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/dune', duneRoutes);
+app.use('/api/memos', memoRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
