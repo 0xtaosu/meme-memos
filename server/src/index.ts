@@ -10,7 +10,12 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.PRODUCTION_API_URL || 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+}));
+
 app.use(express.json());
 
 app.use('/api/dune', duneRoutes);
