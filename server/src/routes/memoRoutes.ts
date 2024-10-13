@@ -2,7 +2,7 @@ import express from 'express';
 import { fetchTokenInfo } from '../services/dexScreenService';
 import { createOrUpdateMemo, getMemoByTokenAddress, getAllMemos, addEvent } from '../services/mongoService';
 import { fetchLargeTransactions } from '../services/duneService';
-import { Event } from '../types/memoTypes';
+import { Event, Memo } from '../types/memoTypes';
 
 const router = express.Router();
 
