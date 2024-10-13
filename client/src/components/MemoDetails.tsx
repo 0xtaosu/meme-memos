@@ -133,12 +133,13 @@ const MemoDetails: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors"
+            className="bg-amber-700 text-black py-2 px-4 rounded-md font-bold hover:bg-amber-600 transition-colors duration-300 flex items-center font-serif"
             disabled={isLoading}
           >
-            {isLoading ? 'Adding...' : 'Add Event'}
+            <Skull className="mr-2" size={16} />
+            {isLoading ? 'Inscribing...' : 'Inscribe Ritual'}
           </button>
-          {error && <p className="text-red-500 mt-2">{error}</p>}
+          {error && <p className="text-red-500 mt-2 font-serif">{error}</p>}
         </form>
       </div>
 
