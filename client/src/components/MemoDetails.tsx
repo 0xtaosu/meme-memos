@@ -15,6 +15,9 @@ const MemoDetails: React.FC = () => {
   const [, setError] = useState('')
   const [expandedEvents, setExpandedEvents] = useState<number[]>([])
   const [showForm, setShowForm] = useState(false)
+  const [startTime, setStartTime] = useState('')
+  const [minAmountUsd, setMinAmountUsd] = useState('')
+  const [showAquiverFields, setShowAquiverFields] = useState(false)
 
   useEffect(() => {
     const fetchMemo = async () => {
@@ -38,12 +41,22 @@ const MemoDetails: React.FC = () => {
       setIsLoading(true)
       setError('')
       try {
-        const newEvent: Event = { timestamp, description, link: link || '', _id: '' }
+        const newEvent: Event = {
+          timestamp,
+          description,
+          link: link || '',
+          _id: '',
+          startTime: startTime || undefined,
+          minAmountUsd: minAmountUsd ? parseFloat(minAmountUsd) : undefined
+        }
         const updatedMemo = await addEvent(tokenAddress, newEvent)
         setMemo(updatedMemo)
         setTimestamp('')
         setDescription('')
         setLink('')
+        setStartTime('')
+        setMinAmountUsd('')
+        setShowAquiverFields(false)
         setShowForm(false)
       } catch (err) {
         setError('Failed to add event. Please try again.')
@@ -349,6 +362,44 @@ const MemoDetails: React.FC = () => {
                   placeholder="https://example.com"
                 />
               </div>
+              <div className="mb-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAquiverFields(!showAquiverFields)}
+                  className="text-amber-400 hover:text-amber-300 underline"
+                >
+                  Aquiver
+                </button>
+              </div>
+              {showAquiverFields && (
+                <>
+                  <div className="mb-4">
+                    <label htmlFor="startTime" className="block text-amber-200 font-semibold mb-2 font-serif">
+                      Start Time (optional)
+                    </label>
+                    <input
+                      type="datetime-local"
+                      id="startTime"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-700 border border-amber-900 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600 text-amber-100"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label htmlFor="minAmountUsd" className="block text-amber-200 font-semibold mb-2 font-serif">
+                      Minimum Amount USD (optional)
+                    </label>
+                    <input
+                      type="number"
+                      id="minAmountUsd"
+                      value={minAmountUsd}
+                      onChange={(e) => setMinAmountUsd(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-700 border border-amber-900 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600 text-amber-100"
+                      placeholder="1000"
+                    />
+                  </div>
+                </>
+              )}
               <div className="flex justify-end mt-4">
                 <button
                   onClick={() => setShowForm(false)}

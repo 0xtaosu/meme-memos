@@ -12,6 +12,8 @@ export interface Event {
     description: string;
     link?: string;  // 使用可选属性
     largeTransactions?: LargeTransaction[];
+    startTime?: string;
+    minAmountUsd?: number;
 }
 
 export interface Memo {

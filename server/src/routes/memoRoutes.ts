@@ -60,7 +60,7 @@ router.get('/', async (req, res) => {
 router.post('/:tokenAddress/events', authMiddleware, async (req, res) => {
     try {
         const { tokenAddress } = req.params;
-        const { timestamp, description, link } = req.body;
+        const { timestamp, description, link, endTime, minAmountUsd } = req.body;
 
         if (!timestamp || !description) {
             return res.status(400).json({ error: "Timestamp and description are required" });
@@ -75,13 +75,16 @@ router.post('/:tokenAddress/events', authMiddleware, async (req, res) => {
 
         const startTime = new Date(timestamp);
         startTime.setHours(startTime.getHours() - 24);
-        const endTime = new Date(timestamp);
+        const eventEndTime = endTime ? new Date(endTime) : new Date(timestamp);
+        const minAmount = minAmountUsd ? parseFloat(minAmountUsd) : 1000;
 
         try {
+            console.log(startTime.toISOString() + " " + eventEndTime.toISOString() + minAmount)
             const largeTransactions = await fetchLargeTransactions(
                 startTime.toISOString(),
-                endTime.toISOString(),
-                tokenAddress
+                eventEndTime.toISOString(),
+                tokenAddress,
+                minAmount
             );
             newEvent.largeTransactions = largeTransactions;
         } catch (error) {

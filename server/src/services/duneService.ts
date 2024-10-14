@@ -18,22 +18,21 @@ const formatDate = (dateString: string): string => {
     return date.toISOString().replace('T', ' ').substr(0, 19);
 };
 
-export const fetchLargeTransactions = async (startTime: string, endTime: string, tokenAddress: string) => {
+export const fetchLargeTransactions = async (startTime: string, endTime: string, tokenAddress: string, minAmountUsd: number = 1000) => {
     console.log(`Fetching large transactions for token: ${tokenAddress}`);
-    console.log(`Original time range: ${startTime} to ${endTime}`);
+    console.log(`Time range: ${startTime} to ${endTime}`);
+    console.log(`Minimum amount USD: ${minAmountUsd}`);
 
     const QUERY_ID = 4139932; // Replace with your actual query ID
 
     const formattedStartTime = formatDate(startTime);
     const formattedEndTime = formatDate(endTime);
 
-    console.log(`Formatted time range: ${formattedStartTime} to ${formattedEndTime}`);
-
     const query_parameters = [
         QueryParameter.text("END_TIME", formattedEndTime),
         QueryParameter.text("START_TIME", formattedStartTime),
         QueryParameter.text("TOKEN_ADDRESS", tokenAddress),
-        QueryParameter.number("MIN_AMOUNT_USD", "1000"),
+        QueryParameter.number("MIN_AMOUNT_USD", minAmountUsd.toString()),
     ];
 
     console.log('Query parameters:', JSON.stringify(query_parameters, null, 2));

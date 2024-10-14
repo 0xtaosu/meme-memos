@@ -17,9 +17,11 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 interface Event {
-    timestamp: string;
+    timestap: string;
     description: string;
     link: string;
+    startTime?: string;
+    minAmountUsd?: number;
 }
 
 export const getAllMemos = async (): Promise<Memo[]> => {
