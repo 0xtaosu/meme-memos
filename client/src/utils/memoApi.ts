@@ -4,6 +4,18 @@ import { Memo } from '../types';
 // 假设您的后端 API 基础 URL 存储在环境变量中
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'; // Replace with your actual API URL
 
+const axiosInstance = axios.create({
+    baseURL: API_BASE_URL,
+});
+
+axiosInstance.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 interface Event {
     timestamp: string;
     description: string;
@@ -12,7 +24,7 @@ interface Event {
 
 export const getAllMemos = async (): Promise<Memo[]> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/memos`);
+        const response = await axiosInstance.get('/memos');
         return response.data;
     } catch (error) {
         console.error('Error fetching all memos:', error);
@@ -22,7 +34,7 @@ export const getAllMemos = async (): Promise<Memo[]> => {
 
 export const getMemo = async (tokenAddress: string): Promise<Memo> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/memos/${tokenAddress}`);
+        const response = await axiosInstance.get(`/memos/${tokenAddress}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching memo:', error);
@@ -32,7 +44,7 @@ export const getMemo = async (tokenAddress: string): Promise<Memo> => {
 
 export const createMemo = async (tokenAddress: string): Promise<Memo> => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/memos`, { tokenAddress, events: [] });
+        const response = await axiosInstance.post('/memos', { tokenAddress, events: [] });
         return response.data;
     } catch (error) {
         console.error('Error creating memo:', error);
@@ -42,7 +54,7 @@ export const createMemo = async (tokenAddress: string): Promise<Memo> => {
 
 export const addEvent = async (tokenAddress: string, event: Event): Promise<Memo> => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/memos/${tokenAddress}/events`, event);
+        const response = await axiosInstance.post(`/memos/${tokenAddress}/events`, event);
         return response.data;
     } catch (error) {
         console.error('Error adding event:', error);

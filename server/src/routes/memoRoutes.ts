@@ -2,11 +2,12 @@ import express from 'express';
 import { fetchTokenInfo } from '../services/dexScreenService';
 import { createOrUpdateMemo, getMemoByTokenAddress, getAllMemos, addEvent } from '../services/mongoService';
 import { fetchLargeTransactions } from '../services/duneService';
-import { Event, Memo } from '../types/memoTypes';
+import { Event } from '../types/memoTypes';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         const { tokenAddress } = req.body;
 
@@ -55,7 +56,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/:tokenAddress/events', async (req, res) => {
+router.post('/:tokenAddress/events', authMiddleware, async (req, res) => {
     try {
         const { tokenAddress } = req.params;
         const { timestamp, description, link } = req.body;

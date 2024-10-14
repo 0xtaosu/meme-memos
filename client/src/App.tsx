@@ -7,6 +7,8 @@ import MemoForm from './components/MemoForm'
 import MemoDetails from './components/MemoDetails'
 import { getAllMemos } from './utils/memoApi'
 import { Memo } from './types'
+import { AuthProvider } from './contexts/AuthContext'
+import Login from './components/Login'
 
 function App() {
   const [memos, setMemos] = useState<Memo[]>([]);
@@ -26,19 +28,22 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen bg-black">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/" element={<Home memos={memos} />} />
-            <Route path="/create" element={<MemoForm />} />
-            <Route path="/memo/:tokenAddress" element={<MemoDetails />} />
-          </Routes>
+    <AuthProvider>
+      <Router>
+        <div className="flex flex-col min-h-screen bg-black">
+          <Header />
+          <div className="container mx-auto px-4 py-8">
+            <Routes>
+              <Route path="/" element={<Home memos={memos} />} />
+              <Route path="/create" element={<MemoForm />} />
+              <Route path="/memo/:tokenAddress" element={<MemoDetails />} />
+              <Route path="/login" element={<Login />} />
+            </Routes>
+          </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

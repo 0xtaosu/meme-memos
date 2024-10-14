@@ -4,6 +4,7 @@ Meme Memos 是一个专为 memecoin 爱好者和投资者设计的备忘录网�
 
 ## 主要功能
 
+- 简单的用户登录系统（使用 .env 文件中的凭据）
 - 通过 token address 生成或访问 memecoin 专属备忘录页面
 - 添加、编辑和删除与 memecoin 相关的重要事件
 - 为每个事件记录时间、内容描述和相关链接
@@ -13,12 +14,13 @@ Meme Memos 是一个专为 memecoin 爱好者和投资者设计的备忘录网�
 
 ## 使用方法
 
-1. 在主页输入 memecoin 的 token address
-2. 点击"生成"或"进入"按钮，跳转到对应的 memo 页面
-3. 在 memo 页面查看已记录的事件，或添加新的事件
-4. 使用编辑和删除功能管理已有事件
-5. 查看每个事件下方折叠展示的大额买家信息
-6. 查看页面顶部显示的 memecoin 基本信息
+1. 在主页使用 .env 文件中配置的用户名和密码登录
+2. 在主页输入 memecoin 的 token address
+3. 点击"生成"或"进入"按钮，跳转到对应的 memo 页面
+4. 在 memo 页面查看已记录的事件，或添加新的事件
+5. 使用编辑和删除功能管理已有事件
+6. 查看每个事件下方折叠展示的大额买家信息
+7. 查看页面顶部显示的 memecoin 基本信息
 
 ## 技术栈
 
@@ -53,6 +55,8 @@ Meme Memos 是一个专为 memecoin 爱好者和投资者设计的备忘录网�
     ├── src/
     │   ├── routes/
     │   ├── services/
+    │   ├── types/
+    │   ├── middleware/
     │   └── index.ts
     └── package.json
 ```
@@ -185,12 +189,30 @@ API 端点：`https://api.dexscreener.com/latest/dex/tokens/{tokenAddress}`
   - 状态码: 201
   - 内容: 更新后的 memo 对象
 - **错误响应**:
-  - 状态码: 404
-  - 内容: `{ "error": "Memo not found" }`
+  - 状态码: 404  - 内容: `{ "error": "Memo not found" }`
 ````
 
+### 5. 用户登录
 
+- **URL**: `/api/auth/login`
+- **方法**: `POST`
+- **数据参数**: 
+  ```json
+  {
+    "username": "admin",
+    "password": "secure_password"
+  }
+  ```
+- **成功响应**: 
+  - 状态码: 200
+  - 内容: `{ "token": "JWT_TOKEN_HERE" }`
+- **错误响应**:
+  - 状态码: 401
+  - 内容: `{ "error": "Invalid credentials" }`
 
+## TODO
+
+- [ ] 添加用户白名单功能
 
 ## 贡献
 
