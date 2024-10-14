@@ -1,4 +1,4 @@
-import { MongoClient, Db, Collection, ReturnDocument } from 'mongodb';
+import { MongoClient, Db, Collection, ReturnDocument, ObjectId } from 'mongodb';
 import dotenv from 'dotenv';
 import path from 'path';
 import { Memo } from '../types/memoTypes';
@@ -35,14 +35,19 @@ export async function createOrUpdateMemo(tokenAddress: string, memoData: Partial
     await connectToDatabase();
 
     const filter = { tokenAddress };
-    const update = {
+    let update: any = {
         $set: {
             ...memoData,
             tokenAddress,
             lastUpdated: new Date()
-        },
-        $setOnInsert: { events: [] }
+        }
     };
+
+    // 如果是新文档，初始化 events 数组
+    if (!memoData.events) {
+        update.$setOnInsert = { events: [] };
+    }
+
     const options = { upsert: true, returnDocument: ReturnDocument.AFTER };
 
     const result = await memos.findOneAndUpdate(filter, update, options);
@@ -99,4 +104,34 @@ export async function addLargeTransactions(eventId: string, transactions: any[])
 
     console.log('Successfully added large transactions:', result);
     return result;
+}
+
+// Add these new functions after the existing functions
+
+export async function deleteMemo(tokenAddress: string): Promise<boolean> {
+    await connectToDatabase();
+
+    const result = await memos.deleteOne({ tokenAddress });
+
+    return result.deletedCount === 1;
+}
+
+export async function deleteEvent(memoId: string, eventId: string) {
+    if (!eventId || eventId === 'undefined') {
+        throw new Error('Invalid event ID');
+    }
+
+    try {
+        const result = await memos.deleteOne({ _id: new ObjectId(eventId), memoId });
+        if (result.deletedCount === 0) {
+            throw new Error('Event not found');
+        }
+        return result;
+    } catch (error) {
+        if (error instanceof Error && error.message === 'Invalid event ID') {
+            throw error;
+        }
+        console.error('Error deleting event:', error);
+        throw new Error('Failed to delete event');
+    }
 }

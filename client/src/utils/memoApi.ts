@@ -61,3 +61,22 @@ export const addEvent = async (tokenAddress: string, event: Event): Promise<Memo
         throw error;
     }
 };
+
+export const deleteMemo = async (tokenAddress: string): Promise<void> => {
+    try {
+        await axiosInstance.delete(`/memos/${tokenAddress}`);
+    } catch (error) {
+        console.error('Error deleting memo:', error);
+        throw error;
+    }
+};
+
+export const deleteEvent = async (tokenAddress: string, eventId: string): Promise<Memo> => {
+    try {
+        const response = await axiosInstance.delete(`/memos/${tokenAddress}/events/${eventId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting event:', error);
+        throw error;
+    }
+};

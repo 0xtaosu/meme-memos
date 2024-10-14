@@ -1,9 +1,10 @@
 // 定义 Event 接口
 export interface Event {
+    _id: string;
     timestamp: Date;
     description: string;
     link?: string;
-    largeTransactions?: any[]; // 这里的类型可能需要根据实际数据结构进行调整
+    largeTransactions?: any[];
 }
 
 // 定义 Memo 接口

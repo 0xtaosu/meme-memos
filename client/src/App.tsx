@@ -34,7 +34,7 @@ function App() {
           <Header />
           <div className="container mx-auto px-4 py-8">
             <Routes>
-              <Route path="/" element={<Home memos={memos} />} />
+              <Route path="/" element={<Home memos={memos} setMemos={setMemos} />} />
               <Route path="/create" element={<MemoForm />} />
               <Route path="/memo/:tokenAddress" element={<MemoDetails />} />
               <Route path="/login" element={<Login />} />

@@ -125,9 +125,6 @@ API 端点：`https://api.dexscreener.com/latest/dex/tokens/{tokenAddress}`
 
 我们的后端提供了以下 API 端点：
 
-## 后端 API 文档
-
-我们的后端提供了以下 API 端点：
 
 ### 1. 获取所有 Memos
 
@@ -190,7 +187,6 @@ API 端点：`https://api.dexscreener.com/latest/dex/tokens/{tokenAddress}`
   - 内容: 更新后的 memo 对象
 - **错误响应**:
   - 状态码: 404  - 内容: `{ "error": "Memo not found" }`
-````
 
 ### 5. 用户登录
 
@@ -210,9 +206,37 @@ API 端点：`https://api.dexscreener.com/latest/dex/tokens/{tokenAddress}`
   - 状态码: 401
   - 内容: `{ "error": "Invalid credentials" }`
 
+### 6. 删除 Memo
+
+- **URL**: `/api/memos/:tokenAddress`
+- **方法**: `DELETE`
+- **URL 参数**: 
+  - `tokenAddress`: Memecoin 的合约地址
+- **成功响应**: 
+  - 状态码: 200
+  - 内容: `{ "message": "Memo deleted successfully" }`
+- **错误响应**:
+  - 状态码: 404
+  - 内容: `{ "error": "Memo not found" }`
+
+### 7. 删除事件
+
+- **URL**: `/api/memos/:tokenAddress/events/:eventId`
+- **方法**: `DELETE`
+- **URL 参数**: 
+  - `tokenAddress`: Memecoin 的合约地址
+  - `eventId`: 要删除的事件 ID
+- **成功响应**: 
+  - 状态码: 200
+  - 内容: 更新后的 memo 对象
+- **错误响应**:
+  - 状态码: 404
+  - 内容: `{ "error": "Memo or event not found" }`
+
 ## TODO
 
 - [ ] 添加用户白名单功能
+- [ ] 实现删除 memo 和 event 的功能
 
 ## 贡献
 

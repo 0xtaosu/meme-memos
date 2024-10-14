@@ -1,9 +1,10 @@
 import express from 'express';
 import { fetchTokenInfo } from '../services/dexScreenService';
-import { createOrUpdateMemo, getMemoByTokenAddress, getAllMemos, addEvent } from '../services/mongoService';
+import { createOrUpdateMemo, getMemoByTokenAddress, getAllMemos, addEvent, deleteMemo, deleteEvent } from '../services/mongoService';
 import { fetchLargeTransactions } from '../services/duneService';
 import { Event } from '../types/memoTypes';
 import { authMiddleware } from '../middleware/authMiddleware';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
 
@@ -66,6 +67,7 @@ router.post('/:tokenAddress/events', authMiddleware, async (req, res) => {
         }
 
         const newEvent: Event = {
+            _id: uuidv4(),
             timestamp: new Date(timestamp),
             description,
             link
@@ -90,8 +92,50 @@ router.post('/:tokenAddress/events', authMiddleware, async (req, res) => {
 
         res.status(201).json(updatedMemo);
     } catch (error) {
-        console.error('Error adding event:', error);
-        res.status(500).json({ error: "Internal server error" });
+        console.error(`Error adding event:`, error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.delete('/:tokenAddress', authMiddleware, async (req, res) => {
+    try {
+        const { tokenAddress } = req.params;
+        const result = await deleteMemo(tokenAddress);
+
+        if (result) {
+            res.json({ message: 'Memo deleted successfully' });
+        } else {
+            res.status(404).json({ error: 'Memo not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting memo:', error);
+        res.status(500).json({ error: 'An error occurred while deleting the memo' });
+    }
+});
+
+router.delete('/:tokenAddress/events/:eventId', authMiddleware, async (req, res) => {
+    const { tokenAddress, eventId } = req.params;
+
+    try {
+        const memo = await getMemoByTokenAddress(tokenAddress);
+
+        if (!memo) {
+            return res.status(404).json({ error: 'Memo not found' });
+        }
+
+        const updatedEvents = memo.events.filter(event => event._id !== eventId);
+
+        if (updatedEvents.length === memo.events.length) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+
+        // 使用 createOrUpdateMemo 函数更新 memo
+        const updatedMemo = await createOrUpdateMemo(tokenAddress, { events: updatedEvents });
+
+        res.status(200).json(updatedMemo); // 返回完整的更新后的 memo 对象
+    } catch (error) {
+        console.error(`Error deleting event:`, error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
