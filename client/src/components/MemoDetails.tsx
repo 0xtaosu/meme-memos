@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { getMemo, addEvent } from '../utils/memoApi'
 import { Memo, Event, LargeTransaction } from '../types'
-import { Skull, Scroll, Coins } from 'lucide-react'
+import { Skull, Scroll, Coins, Download } from 'lucide-react'
 
 const MemoDetails: React.FC = () => {
   const { tokenAddress } = useParams<{ tokenAddress: string }>()
@@ -13,6 +13,7 @@ const MemoDetails: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [expandedEvents, setExpandedEvents] = useState<number[]>([])
+  const [] = useState(false)
 
   useEffect(() => {
     const fetchMemo = async () => {
@@ -55,6 +56,72 @@ const MemoDetails: React.FC = () => {
     setExpandedEvents(prev =>
       prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
     )
+  }
+
+  const generateCSV = () => {
+    if (!memo) return ''
+
+    const headers = ['Timestamp', 'Description', 'Link']
+    const rows = memo.events.map(event => [
+      event.timestamp,
+      event.description,
+      event.link
+    ])
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n')
+
+    return csvContent
+  }
+
+  const downloadCSV = () => {
+    const csvContent = generateCSV()
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', `${memo?.symbol}_events.csv`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
+  const generateMajorOfferingsCSV = (transactions: LargeTransaction[]) => {
+    const headers = ['Devotee\'s Sigil', 'Offering (USD)', 'Token Quantity', 'Time of Offering', 'Ritual Hash']
+    const rows = transactions.map(tx => [
+      tx.buyer_address,
+      tx.amount_usd.toFixed(2),
+      tx.token_bought_amount.toFixed(2),
+      new Date(tx.block_time).toLocaleString(),
+      tx.tx_hash
+    ])
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n')
+
+    return csvContent
+  }
+
+  const downloadMajorOfferingsCSV = (transactions: LargeTransaction[], eventTimestamp: string) => {
+    const csvContent = generateMajorOfferingsCSV(transactions)
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      link.setAttribute('download', `${memo?.symbol}_major_offerings_${eventTimestamp}.csv`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
   }
 
   if (!memo) {
@@ -145,9 +212,12 @@ const MemoDetails: React.FC = () => {
 
       {/* Events List */}
       <div className="bg-gray-800 p-6 rounded-lg shadow-md border border-amber-900">
-        <h2 className="text-2xl font-semibold mb-6 font-serif text-amber-400 flex items-center">
-          <Scroll className="mr-2" /> Recorded Rituals
-        </h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold font-serif text-amber-400 flex items-center">
+            <Scroll className="mr-2" /> Recorded Rituals
+          </h2>
+          {/* Removed the duplicate Download CSV button */}
+        </div>
         {memo.events.length === 0 ? (
           <p className="text-amber-200 font-serif">The grimoire pages remain blank, awaiting the first inscription.</p>
         ) : (
@@ -174,13 +244,22 @@ const MemoDetails: React.FC = () => {
                 {/* Large Transactions for this event */}
                 {event.largeTransactions && event.largeTransactions.length > 0 && (
                   <div className="mt-6">
-                    <button
-                      onClick={() => toggleEventExpansion(index)}
-                      className="bg-amber-700 text-black py-2 px-4 rounded-md font-bold hover:bg-amber-600 transition-colors mb-4 font-serif flex items-center"
-                    >
-                      <Coins className="mr-2" size={16} />
-                      {expandedEvents.includes(index) ? 'Conceal' : 'Reveal'} Major Offerings
-                    </button>
+                    <div className="flex justify-between items-center mb-4">
+                      <button
+                        onClick={() => toggleEventExpansion(index)}
+                        className="bg-amber-700 text-black py-2 px-4 rounded-md font-bold hover:bg-amber-600 transition-colors font-serif flex items-center"
+                      >
+                        <Coins className="mr-2" size={16} />
+                        {expandedEvents.includes(index) ? 'Conceal' : 'Reveal'} Major Offerings
+                      </button>
+                      <button
+                        onClick={() => downloadMajorOfferingsCSV(event.largeTransactions, event.timestamp)}
+                        className="bg-amber-700 text-black py-2 px-4 rounded-md font-bold hover:bg-amber-600 transition-colors font-serif flex items-center"
+                      >
+                        <Download className="mr-2" size={16} />
+                        Download CSV
+                      </button>
+                    </div>
                     {expandedEvents.includes(index) && (
                       <div className="overflow-x-auto">
                         <table className="min-w-full bg-gray-800 text-amber-100 border-collapse">
