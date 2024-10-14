@@ -7,6 +7,7 @@ export interface LargeTransaction {
 }
 
 export interface Event {
+    _id: string;
     timestamp: string;
     description: string;
     link?: string;  // 使用可选属性

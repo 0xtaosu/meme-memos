@@ -38,7 +38,7 @@ const MemoDetails: React.FC = () => {
       setIsLoading(true)
       setError('')
       try {
-        const newEvent: Event = { timestamp, description, link: link ?? '' }
+        const newEvent: Event = { timestamp, description, link: link || '', _id: '' }
         const updatedMemo = await addEvent(tokenAddress, newEvent)
         setMemo(updatedMemo)
         setTimestamp('')
@@ -160,6 +160,16 @@ const MemoDetails: React.FC = () => {
           {/* Left column: Memo details and actions */}
           <div className="md:w-1/3">
             <div className="bg-gray-800 p-6 rounded-lg shadow-md border border-amber-900 mb-6">
+              {/* 添加图片 */}
+              {memo.imageUrl && (
+                <div className="mb-4">
+                  <img
+                    src={memo.imageUrl}
+                    alt={memo.name}
+                    className="w-64 h-64 object-cover rounded-lg shadow-lg border border-amber-600 mx-auto mb-4"
+                  />
+                </div>
+              )}
               {/* Memo details */}
               <h2 className="text-2xl font-semibold mb-4 font-serif text-amber-400 flex items-center">
                 <Scroll className="mr-2" /> Arcane Inscriptions
