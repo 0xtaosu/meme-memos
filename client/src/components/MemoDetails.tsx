@@ -174,9 +174,6 @@ const MemoDetails: React.FC = () => {
               <h2 className="text-2xl font-semibold mb-4 font-serif text-amber-400 flex items-center">
                 <Scroll className="mr-2" /> Arcane Inscriptions
               </h2>
-              <p className="mb-2 font-serif"><strong className="text-amber-400">Offering:</strong> ${memo.priceUsd.toFixed(4)}</p>
-              <p className="mb-2 font-serif"><strong className="text-amber-400">Ritual Pool:</strong> ${memo.liquidity.usd.toLocaleString()}</p>
-              <p className="mb-2 font-serif"><strong className="text-amber-400">Daily Sacrifice:</strong> ${memo.volume.h24.toLocaleString()}</p>
               <p className="mb-2 font-mono text-sm"><strong className="text-amber-400">Sigil:</strong> {memo.tokenAddress}</p>
               <p className="mb-2 font-serif"><strong className="text-amber-400">True Name:</strong> {memo.name}</p>
             </div>
