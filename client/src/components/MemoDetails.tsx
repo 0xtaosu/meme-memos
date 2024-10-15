@@ -312,7 +312,7 @@ const MemoDetails: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label htmlFor="timestamp" className="block text-amber-200 font-semibold mb-2 font-serif">
-                  Time of Invocation (UTC)
+                  Time of Invocation
                 </label>
                 <input
                   type="datetime-local"
@@ -362,7 +362,7 @@ const MemoDetails: React.FC = () => {
                 <>
                   <div className="mb-4">
                     <label htmlFor="startTime" className="block text-amber-200 font-semibold mb-2 font-serif">
-                      Start Time (UTC, optional)
+                      Start Time (optional)
                     </label>
                     <input
                       type="datetime-local"
