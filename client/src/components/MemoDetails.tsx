@@ -42,11 +42,11 @@ const MemoDetails: React.FC = () => {
       setError('')
       try {
         const newEvent: Event = {
-          timestamp,
+          timestamp: new Date(timestamp).toISOString(),
           description,
           link: link || '',
           _id: '',
-          startTime: startTime || undefined,
+          startTime: startTime ? new Date(startTime).toISOString() : undefined,
           minAmountUsd: minAmountUsd ? parseFloat(minAmountUsd) : undefined
         }
         const updatedMemo = await addEvent(tokenAddress, newEvent)
@@ -325,7 +325,7 @@ const MemoDetails: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label htmlFor="timestamp" className="block text-amber-200 font-semibold mb-2 font-serif">
-                  Time of Invocation
+                  Time of Invocation (UTC)
                 </label>
                 <input
                   type="datetime-local"
@@ -375,7 +375,7 @@ const MemoDetails: React.FC = () => {
                 <>
                   <div className="mb-4">
                     <label htmlFor="startTime" className="block text-amber-200 font-semibold mb-2 font-serif">
-                      Start Time (optional)
+                      Start Time (UTC, optional)
                     </label>
                     <input
                       type="datetime-local"
