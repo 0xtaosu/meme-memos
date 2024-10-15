@@ -41,15 +41,20 @@ const MemoDetails: React.FC = () => {
       setIsLoading(true)
       setError('')
       try {
+
         const newEvent: Event = {
-          timestamp: new Date(timestamp).toISOString(),
+          timestamp: new Date(timestamp).toUTCString(),
           description,
           link: link || '',
           _id: '',
-          startTime: startTime ? new Date(startTime).toISOString() : undefined,
+          startTime: startTime ? new Date(startTime).toUTCString() : undefined,
           minAmountUsd: minAmountUsd ? parseFloat(minAmountUsd) : undefined
         }
-        const updatedMemo = await addEvent(tokenAddress, newEvent)
+        const updatedMemo = await addEvent(tokenAddress, {
+          ...newEvent,
+          timestap: newEvent.timestamp, // Changed 'timestamp' to 'timestap' to match the Event type
+          link: newEvent.link || '' // Provide a default empty string if link is undefined
+        })
         setMemo(updatedMemo)
         setTimestamp('')
         setDescription('')
@@ -97,24 +102,6 @@ const MemoDetails: React.FC = () => {
     setExpandedEvents(prev =>
       prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
     )
-  }
-
-  const generateCSV = () => {
-    if (!memo) return ''
-
-    const headers = ['Timestamp', 'Description', 'Link']
-    const rows = memo.events.map(event => [
-      event.timestamp,
-      event.description,
-      event.link
-    ])
-
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n')
-
-    return csvContent
   }
 
 
@@ -262,7 +249,7 @@ const MemoDetails: React.FC = () => {
                               {expandedEvents.includes(index) ? 'Conceal' : 'Reveal'} Major Offerings
                             </button>
                             <button
-                              onClick={() => downloadMajorOfferingsCSV(event.largeTransactions, event.timestamp)}
+                              onClick={() => downloadMajorOfferingsCSV(event.largeTransactions ?? [], event.timestamp)}
                               className="bg-amber-700 text-black py-2 px-4 rounded-md font-bold hover:bg-amber-600 transition-colors duration-300 flex items-center font-serif"
                             >
                               <Download className="mr-2" size={16} />
